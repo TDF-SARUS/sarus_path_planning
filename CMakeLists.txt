@@ -16,6 +16,17 @@ find_package(catkin REQUIRED COMPONENTS
 # find_package(Boost REQUIRED COMPONENTS system)
 
 
+
+
+catkin_install_python(PROGRAMS
+  sarus_path_planning/planner.py
+
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/sarus_path_planning
+)
+
+
+
+
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
