@@ -30,16 +30,20 @@ def makePolygon (points):
     west = np.amin(points[:,0])
 
     # Dividimos en grupos de 10
-    tam = north - south
-    tam2 = round(tam/10)    # Número de índices del array_map
-    tam3 = tam/tam2         # Ancho de barrido que usaremos
+    Ysize = north - south
+    Yindexes = round(Ysize/10)          # Número de índices del array_map
+    Ywidth = Ysize/Yindexes             # Ancho de barrido que usaremos
 
-    y = np.floor(cambiaIntervalo(points[:,1], south, north, 0, tam2))
-    x = np.floor(cambiaIntervalo(points[:,0], west, east, 0, tam2))
+    Xsize = north - south
+    Xindexes = round(Xsize/10)          # Número de índices del array_map
+    Xwidth = Xsize/Xindexes             # Ancho de barrido que usaremos
+
+    y = np.floor(cambiaIntervalo(points[:,1], south, north, 0, Yindexes))
+    x = np.floor(cambiaIntervalo(points[:,0], west, east, 0, Xindexes))
 
     area_maps = polygon(y,x)
 
-    return area_maps, tam3
+    return area_maps, Ywidth, Xwidth
 
 n = 3
 area_maps = get_all_area_maps("test_maps")
