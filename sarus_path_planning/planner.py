@@ -11,12 +11,15 @@ from cpp_algorithms import get_all_area_maps, plot, imshow, imshow_scatter
 from cpp_algorithms.darp.darp_helpers import get_assigned_count
 from cpp_algorithms.coverage_path.pathing_helpers import has_isolated_areas
 from skimage.draw import polygon
-from 
 
 # inicializar nodo ros
 
+# Función auxiliar para cambiar un número N de un intervalo (a0, b0) a otro (aF, bF)
+def cambiaIntervalo (N, a0, b0, aF, bF):
+    return aF + (bF - aF)*(N - a0)/(b0 - a0)
+
 # Para el polígono
-def polygon (points):
+def makePolygon (points):
     # Nos dan cuatro puntos
     points = np.array(points)
 
@@ -31,11 +34,12 @@ def polygon (points):
     tam2 = round(tam/10)    # Número de índices del array_map
     tam3 = tam/tam2         # Ancho de barrido que usaremos
 
-    x = 
+    y = np.floor(cambiaIntervalo(points[:,1], south, north, 0, tam2))
+    x = np.floor(cambiaIntervalo(points[:,0], west, east, 0, tam2))
 
-    polygon(y,x)
+    area_maps = polygon(y,x)
 
-    return tam3
+    return area_maps, tam3
 
 n = 3
 area_maps = get_all_area_maps("test_maps")
