@@ -72,14 +72,23 @@ def initPublisher(droneNum):
     pub = rospy.Publisher(topic, PoseStamped, queue_size=10)
     return pub
 
-def publishTrajectory(pub, coordinates):
+def publishTrajectory(pub, coordinates,home):
     msg = PoseStamped()
     # Also possible with numpy
     #[x_ref, y_ref] = np.split(np.array(coordinates), 2, axis = 1)
     # Separate the position in its coordinates
-    msg.pose.position.x=coordinates[0]
-    msg.pose.position.y=coordinates[1]
-    msg.pose.position.z=1.0 #coordinates[2]
+    if home!=0:
+    	    msg.pose.position.x=coordinates[0]
+    	    msg.pose.position.y=coordinates[0]
+            msg.pose.position.z=1.0 #coordinates[2] #Descomentar en caso de querer controlar coordenada z
+	
+	#HAY QUE METER LAND
+
+    else:
+    	    msg.pose.position.x=coordinates[0]
+            msg.pose.position.y=coordinates[1]
+    	    msg.pose.position.z=1.0 #coordinates[2] #Descomentar en caso de querer controlar coordenada z
+
     # Publish the message (coordinates of the position of drone droneNum)
     pub.publish(msg)
 
@@ -108,6 +117,7 @@ rate = rospy.Rate(0.2) #0.2 Hz -> 5s
 # Datos de Interfaz:
 
 n=3   #n de drones
+home=0  #Si home=1, se manda la orden de volver casa - Esto habra que suscribirse a un topic de interfaz
 
 base_polygon = [] #poligono del mapa
 
@@ -162,12 +172,11 @@ for pos in maxPos:                                # Maximum number of positions
         # Try and except to deal with the problem of having different number of positions
         try:
             # Call the function publishTrajectory sending the number of the drone and the desired position
-            publishTrajectory(drone+1, coverage_path_gazebo[drone][pos])
+            publishTrajectory(drone+1, coverage_path_gazebo[drone][pos],home)
             print('Drone ',drone+1, ' = ', coverage_path_gazebo[drone][pos])
         except:
             print('Drone ',drone+1, ' has reached its final position')
     print()
     rate.sleep() # 5s
-
 
 
