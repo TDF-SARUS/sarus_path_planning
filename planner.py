@@ -8,6 +8,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+import rospy
 from skimage.draw import polygon
 
 from cpp_algorithms import darp, stc, bcd, wavefront
@@ -106,7 +107,7 @@ rate = rospy.Rate(0.2) #0.2 Hz -> 5s
 
 # Datos de Interfaz:
 
-n   #n de drones
+n=3   #n de drones
 
 base_polygon = [] #poligono del mapa
 
@@ -140,7 +141,7 @@ coverage_paths = [bcd(drone_maps[i],start_points[i]) for i in range(n)]  #Calcul
 ### meter topic salida a aerostack drone111/#####
 #################################################
 
-coverage_paths_gazebo = alg2gazebo(coverage_paths)
+coverage_path_gazebo = alg2gazebo(coverage_paths)
 
 
 # Drone with the maximum number of positions: Each drone has a different path with different number of points
