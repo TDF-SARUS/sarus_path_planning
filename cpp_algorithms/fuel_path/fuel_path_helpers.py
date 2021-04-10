@@ -1,6 +1,8 @@
+from __future__ import absolute_import
 import numpy as np
 from copy import deepcopy
 from cpp_algorithms.constants import FU, OB
+from itertools import izip
 
 def udlr(x,y):
     # Up Down Left Right
@@ -9,7 +11,7 @@ def udlr(x,y):
 def get_step(dist_map, point, obs=-1):
     # Get smallest L1 step from point.
     sh = dist_map.shape
-    min_ = float('inf')
+    min_ = float(u'inf')
     p = point
     for direc in udlr(*point):
         x,y = direc
@@ -23,7 +25,7 @@ def get_step(dist_map, point, obs=-1):
     return p, min_
 
 def path_to_fuel(dist_map, loc, fuel=FU, obs=OB):
-    """
+    u"""
     PARAMETERS
     ---
     dist_map : copy of the area_map 
@@ -40,7 +42,7 @@ def path_to_fuel(dist_map, loc, fuel=FU, obs=OB):
     return path
 
 def get_refuel_idx(dist_map, coverage_path, fuel_cap):
-    """
+    u"""
     PARAMETERS
     ---
     dist_map : distance map where fuel points are 0 valued, 
@@ -69,7 +71,7 @@ def get_refuel_idx(dist_map, coverage_path, fuel_cap):
     while True:
         i+=1
         ini_fuel = (fuel_cap - fuel_req)
-        assert ini_fuel > 0, "no fuel left to complete coverage_path" 
+        assert ini_fuel > 0, u"no fuel left to complete coverage_path" 
         # start : how many points have previously been covered.
         # end   : how many points can be covered with available fuel.
         start = cu
@@ -96,7 +98,7 @@ def get_refuel_idx(dist_map, coverage_path, fuel_cap):
         try:
             idx = freq[freq >= 0].argmin()
         except ValueError:
-            raise ValueError("coverage path can't be traversed, insufficient fuel capacity")
+            raise ValueError(u"coverage path can't be traversed, insufficient fuel capacity")
         
         if len(points) > 1 and points[-1] == points[-2]:
             raise ValueError(f"coverage path can't be traversed, insufficient fuel capacity\n stuck at coverage path index :{points[-1]}")
@@ -108,7 +110,7 @@ def get_refuel_idx(dist_map, coverage_path, fuel_cap):
     return points, fcap
 
 def splice_paths(coverage_path, fuel_paths, detour_idx, double_center=False):
-    """
+    u"""
     Inserts detour path to the fuelling station into the original path
     and returns it along with start and end indices of the full path which.
 
@@ -139,7 +141,7 @@ def splice_paths(coverage_path, fuel_paths, detour_idx, double_center=False):
     segments = []
     last_idx = 0
     cumu_len = 0
-    for idx,fuel_path in zip(detour_idx,fuel_paths):
+    for idx,fuel_path in izip(detour_idx,fuel_paths):
         s_e = []
         
         seg = np.array(coverage_path[last_idx:idx])

@@ -14,12 +14,13 @@ from .display_funcs import path_show, path_animate, printer
 # Fuel capacity distance multiplier
 FC_DIST_MULTIPLIER = 5
 
-"""
+u"""
 Test function to run tests on multiple image maps all at once.
 """
 
+from __future__ import absolute_import
 def single_robot_multiple(cpp_algo, area_maps, no_end=True, fuel_paths=False, start_point=None, center_point=None):
-    """
+    u"""
     Returns a DataFrame of test Results. 
     Tests are run with randomly generated points for start, end and fuel.
 
@@ -57,14 +58,14 @@ def single_robot_multiple(cpp_algo, area_maps, no_end=True, fuel_paths=False, st
                 coverage_path = cpp_algo(area_map, start_point)
             else:
                 coverage_path = cpp_algo(area_map, start_point, end_point)
-            t_metrics["success"] = True
-            t_metrics["cp_compute_time"] = time.time() - t
+            t_metrics[u"success"] = True
+            t_metrics[u"cp_compute_time"] = time.time() - t
             c_metrics = coverage_metrics(area_map, coverage_path)
         except:
-            t_metrics["success"] = False
+            t_metrics[u"success"] = False
 
         # Fuel Path calculation.
-        if fuel_paths == True and t_metrics["success"]:
+        if fuel_paths == True and t_metrics[u"success"]:
             n_fuel_stations = np.random.randint(1, 5)
             fuel_points = get_random_coords(area_map, n_fuel_stations)
             dm = dist_fill(area_map, fuel_points)
@@ -75,20 +76,19 @@ def single_robot_multiple(cpp_algo, area_maps, no_end=True, fuel_paths=False, st
             dist_map, detour_idx, fuel_paths_, _ = get_fuel_paths(coverage_path,
                                                                   area_map, fuel_points, fuel_capacity)
             full_path, _ = splice_paths(coverage_path, fuel_paths_, detour_idx)
-            t_metrics["fp_compute_time"] = time.time() - t
+            t_metrics[u"fp_compute_time"] = time.time() - t
             f_metrics = fuel_metrics(
                 fuel_paths_, fuel_capacity, full_path, area_map)
-            f_metrics["max_dist_fuel"] = dist_map.max()
+            f_metrics[u"max_dist_fuel"] = dist_map.max()
 
-        results.append({
+        results.append(set([
             **t_metrics,
             **c_metrics,
-            **f_metrics
-        })
+            **f_metrics]))
     return pd.DataFrame(results)
 
 
-"""
+u"""
 Test Function to run tests on a single test map and show the results
 """
 
@@ -97,8 +97,8 @@ def single_robot_single(cpp_algo, area_map, no_end=True, fuel_paths=False,
                         start_point=None, end_point=None, fuel_points=None,
                         fuel_capacity=None, fp_count=None, animate=False,
                         interval=10, repeat=False, printm=True, show_paths=True,
-                        figsize=(7, 7), cmap="Greys_r"):
-    """
+                        figsize=(7, 7), cmap=u"Greys_r"):
+    u"""
     Returns a DataFrame of test Results. 
     Tests are run with randomly generated points for start, end and fuel.
 
@@ -152,13 +152,13 @@ def single_robot_single(cpp_algo, area_map, no_end=True, fuel_paths=False,
             coverage_path = cpp_algo(area_map, start_point)
         else:
             coverage_path = cpp_algo(area_map, start_point, end_point)
-        t_metrics["success"] = True
-        t_metrics["cp_compute_time"] = time.time() - t
+        t_metrics[u"success"] = True
+        t_metrics[u"cp_compute_time"] = time.time() - t
         c_metrics = coverage_metrics(area_map, coverage_path)
     except:
-        t_metrics["success"] = False
+        t_metrics[u"success"] = False
 
-    if fuel_paths == True and t_metrics["success"]:
+    if fuel_paths == True and t_metrics[u"success"]:
         if fuel_points is None:
             fp_count = np.random.randint(
                 1, 5) if fp_count is None else fp_count
@@ -174,28 +174,27 @@ def single_robot_single(cpp_algo, area_map, no_end=True, fuel_paths=False,
                                                                                area_map, fuel_points, fuel_capacity)
 
         full_path, _ = splice_paths(coverage_path, fuel_paths_, detour_idx)
-        t_metrics["fp_compute_time"] = time.time() - t
+        t_metrics[u"fp_compute_time"] = time.time() - t
         f_metrics = fuel_metrics(
             fuel_paths_, fuel_capacity, full_path, area_map)
-        f_metrics["max_dist_fuel"] = dist_map.max()
+        f_metrics[u"max_dist_fuel"] = dist_map.max()
 
-    metrics = {
+    metrics = set([
         **t_metrics,
         **c_metrics,
-        **f_metrics,
-    }
+        **f_metrics,])
 
     values = {
-        "area_map": area_map,
-        "coverage_path": coverage_path,
-        "fuel_paths": fuel_paths_,
-        "detour_idx": detour_idx,
-        "dist_map": dist_map,
-        "fuel_points": fuel_points,
-        "fuel_capacity": fuel_capacity,
-        "start_point": start_point,
-        "end_point": end_point,
-        "fuel_capacity_list": fuel_capacity_list
+        u"area_map": area_map,
+        u"coverage_path": coverage_path,
+        u"fuel_paths": fuel_paths_,
+        u"detour_idx": detour_idx,
+        u"dist_map": dist_map,
+        u"fuel_points": fuel_points,
+        u"fuel_capacity": fuel_capacity,
+        u"start_point": start_point,
+        u"end_point": end_point,
+        u"fuel_capacity_list": fuel_capacity_list
     }
     if coverage_path is None:
         return metrics, values
@@ -205,7 +204,7 @@ def single_robot_single(cpp_algo, area_map, no_end=True, fuel_paths=False,
                   dist_map, figsize=figsize, cmap=cmap)
 
     if animate:
-        values["__anim__"] = path_animate(values, interval, repeat)
+        values[u"__anim__"] = path_animate(values, interval, repeat)
 
     if printm:
         printer(metrics)

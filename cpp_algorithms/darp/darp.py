@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import numpy as np
 from cpp_algorithms.constants import OB
 from .iterate import iterate
@@ -7,7 +8,7 @@ from .darp_helpers import get_no_obs_count, get_coverage_ratio
 
 
 def darp(epochs, area_map, start_points, drone_speed=None, drone_coverage=None, use_flood=True, pbar=False, obstacle=OB):
-    """
+    u"""
     Runs DARP on the given area map and returns the assignement matrix.
 
     PARAMETERS
@@ -18,8 +19,7 @@ def darp(epochs, area_map, start_points, drone_speed=None, drone_coverage=None, 
     drone_speed : speed of each drone in distance/time
     drone_coverage : coverage area of each drone in distance^2
     use_flood : whether to use the l1 flood fill distance, (takes time and a lot of RAM, more accurate)
-    pbar : whether to show the progress bar, True – shows the pbar.
-
+    pbar : whether to show the progress bar, shows the pbar.
     RETURNS
     ---
     Assignment matrix

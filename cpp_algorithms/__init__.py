@@ -1,4 +1,5 @@
 # Main caller
+from __future__ import absolute_import
 from .cpp import cpp
 
 # Helper functions

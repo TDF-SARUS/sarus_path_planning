@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from cpp_algorithms.darp import darp
 from cpp_algorithms.coverage_path.bcd import bcd
 from cpp_algorithms.coverage_path.stc import stc
@@ -9,7 +10,7 @@ from cpp_algorithms.fuel_path.fuel_path_helpers import splice_paths
 
 def cpp(area_map, start_points, fuel_points=None, fuel_capacity=None, online=False, epochs=300, use_flood=True,
         drone_speed=None, drone_coverage=None, pbar=False):
-    """
+    u"""
     The main coverage path caller will return coverage_paths for
     each of the sub areas depending on the number of `start_points`.
 
@@ -28,19 +29,19 @@ def cpp(area_map, start_points, fuel_points=None, fuel_capacity=None, online=Fal
     if n > 1:
         A, _ = darp(epochs, area_map, start_points, use_flood=use_flood,
                     pbar=pbar, drone_speed=drone_speed, drone_coverage=drone_coverage)
-        drone_maps = [get_drone_map(A, i) for i in range(n)]
+        drone_maps = [get_drone_map(A, i) for i in xrange(n)]
     else:
         drone_maps = [area_map]
 
-    if online == "wavefront":
+    if online == u"wavefront":
         coverage_paths = [wavefront(drone_maps[i], start_points[i])
-                          for i in range(n)]
+                          for i in xrange(n)]
     elif online:
         coverage_paths = [bcd(drone_maps[i], start_points[i])
-                          for i in range(n)]
+                          for i in xrange(n)]
     else:
         coverage_paths = [stc(drone_maps[i], start_points[i])
-                          for i in range(n)]
+                          for i in xrange(n)]
     if fuel_points is not None and fuel_capacity is not None:
         full_paths = []
         detour_idxes = []

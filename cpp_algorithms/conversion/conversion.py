@@ -1,3 +1,5 @@
+from __future__ import division
+from __future__ import absolute_import
 from .conversion_helpers import get_scale, get_gpdframe
 from .conversion_helpers import create_gdframe
 from .conversion_helpers import get_features_dict, get_final_coverage_polygon
@@ -9,6 +11,7 @@ from geopy import distance
 from skimage import measure
 from skimage.draw import polygon
 from cpp_algorithms.constants import CRS, EPSG, KEY, GEOM_POINT
+from itertools import imap
 
 
 def get_raster(gpdf_final, scale=2000, CRS=CRS):
@@ -19,7 +22,7 @@ def get_raster(gpdf_final, scale=2000, CRS=CRS):
         shp = gpdf_final.set_crs(crs=CRS)
 
     ext = np.array(shp.geometry[0].exterior).copy()
-    ite = map(np.array, shp.geometry[0].interiors)
+    ite = imap(np.array, shp.geometry[0].interiors)
 
     mn = ext.min(axis=0)
     mix = ext - mn
@@ -69,17 +72,17 @@ def down_sample(side, area_map, points, meter=1):
     points = []
     for val in vals:
         points_ = np.stack(np.where(temp == val)).T
-        points.append(list(map(tuple, points_)))
+        points.append(list(imap(tuple, points_)))
         temp[temp == val] = 0
     return temp, points
 
 
 def conversion(side, geojson):
-    """
+    u"""
     side : drone area of coverage square's side in meters.
     geo_json : parsed json in the geojson fromat from the frontend.
     """
-    if isinstance(geojson, str):
+    if isinstance(geojson, unicode):
         geojson = json.loads(geojson)
 
     # contains the GeopandasDataFrames for all featureCollections

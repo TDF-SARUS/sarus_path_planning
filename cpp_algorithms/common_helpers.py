@@ -1,6 +1,7 @@
-"""
+u"""
 Some helper functions that are often used.
 """
+from __future__ import absolute_import
 import numpy as np
 import matplotlib.pyplot as plt
 from .constants import OB, NO
@@ -10,7 +11,7 @@ from PIL import Image
 RES = [(32, 32),(50, 50),(50, 144),(144, 255),(256,256)]
 
 def adjacency_test(path, exactly_one=True):
-    """
+    u"""
     Checks all points in a path for L1 adjacency.
     """
     prev_point = path[0]
@@ -29,7 +30,7 @@ def adjacency_test(path, exactly_one=True):
     return True
 
 def generate_no_obs_area_map(resolutions=RES):
-    """
+    u"""
     resolutions : list of tuples [(rows, cols)]
     """
     area_maps = []
@@ -38,7 +39,7 @@ def generate_no_obs_area_map(resolutions=RES):
     return area_maps
 
 def generate_point_obstacles(area_map, p=0.5):
-    """
+    u"""
     Adds point obstacles to the area_map with the given
     probability `p`, if `p==1` then the entire map will
     be covered.
@@ -48,7 +49,7 @@ def generate_point_obstacles(area_map, p=0.5):
     return area_map
 
 def get_area_map(path, area=0, obs=-1):
-    """
+    u"""
     path : path to area map png, png should have only 
     0 255 as values.
     returns area_map with cell values
@@ -62,26 +63,26 @@ def get_area_map(path, area=0, obs=-1):
     am[~ma]  = obs
     return am
 
-def imshow_scatter(path, color="orange", alpha=1, s=20):
-    """
+def imshow_scatter(path, color=u"orange", alpha=1, s=20):
+    u"""
     Prints the points in the path
     """
     x,y = np.array(path).T
     plt.scatter(y,x, color=color, alpha=alpha, s=s)
 
-def imshow(area_map,r=1,c=1,i=1,figsize=(5,5),cmap="viridis"):
-    """
+def imshow(area_map,r=1,c=1,i=1,figsize=(5,5),cmap=u"viridis"):
+    u"""
     Display with no interpolation.
     """
     if r < 2 and c < 2 or i == 1:
         plt.figure(figsize=figsize)
     plt.subplot(r,c,i)
-    ax = plt.imshow(area_map,interpolation='none',cmap=cmap)
-    plt.axis('off');
+    ax = plt.imshow(area_map,interpolation=u'none',cmap=cmap)
+    plt.axis(u'off');
     return ax
 
-def plot(cp, alpha=0.8, color="lightblue"):
-    """
+def plot(cp, alpha=0.8, color=u"lightblue"):
+    u"""
     Plot coverage path as a line.
     """ 
     cp = np.array(cp)
@@ -89,7 +90,7 @@ def plot(cp, alpha=0.8, color="lightblue"):
     plt.plot(y,x,alpha=alpha,color=color)
 
 def get_random_coords(area_map,n=2,obs=-1):
-    """
+    u"""
     Return random coords from the map
     where there are no obstacles.
     
@@ -99,7 +100,7 @@ def get_random_coords(area_map,n=2,obs=-1):
     r = lambda x : np.random.randint(0,x)
     b1, b2 = area_map.shape
     coords = []
-    for i in range(n):
+    for i in xrange(n):
         while True:
             p = (r(b1), r(b2))
             if area_map[p] != obs:
@@ -108,7 +109,7 @@ def get_random_coords(area_map,n=2,obs=-1):
     return coords
 
 def set_val(area_map, coords, val):
-    """
+    u"""
     Set `val` at given `coords` on
     the `area_map`
     
@@ -120,7 +121,7 @@ def set_val(area_map, coords, val):
     area_map[x,y] = val
 
 def is_bounded(coord, shape):
-    """
+    u"""
     Checks if a coord (x,y) is within bounds.
     """
     x,y = coord
@@ -132,7 +133,7 @@ def is_bounded(coord, shape):
     return True
 
 def is_valid(coord, area_map, obstacle = -1):
-    """
+    u"""
     Check is a coord (x,y) is bounded and not
     on an obstacle.
     """
@@ -151,7 +152,7 @@ def is_valid(coord, area_map, obstacle = -1):
     return False
 
 def get_all_area_maps(folder_path):
-    """
+    u"""
     Returns size sorted list of area maps.
     
     folder_path : path to the folder contiaining the maps (.png)
@@ -167,7 +168,7 @@ def get_all_area_maps(folder_path):
     return list(np.array(ams)[am_idx])
 
 def get_drone_map(A, i, obstacle=OB, coverage=NO):
-    """
+    u"""
     Returns area map for a single drone 
     from the assignment matrix.
     

@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import numpy as np
 from .constants import OB
 from .common_helpers import is_valid
@@ -23,7 +24,7 @@ def dist_fill_single(area_map, fill_point):
     dist_map = area_map.copy().astype(np.int32)
     
     assert is_valid(fill_point, area_map), \
-    "invalid fill point"
+    u"invalid fill point"
     
     fval = 0
     dist_map[fill_point] = fval
@@ -41,7 +42,7 @@ def dist_fill_single(area_map, fill_point):
     return dist_map
 
 def dist_fill(area_map, fill_points):
-    """
+    u"""
     Returns the distance matrix.
 
     PARAMETERS

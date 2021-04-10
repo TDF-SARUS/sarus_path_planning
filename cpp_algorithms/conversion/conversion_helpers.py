@@ -1,3 +1,5 @@
+from __future__ import division
+from __future__ import absolute_import
 import json
 import numpy as np
 import shapely.geometry
@@ -6,10 +8,11 @@ from geopy import distance
 from cpp_algorithms.constants import KEY, COVERAGE, OBSTACLE, POINT
 from cpp_algorithms.constants import AREAS, POINTS, FEATURES, POLYG
 from cpp_algorithms.constants import CRS, GEOM_POINT, GEOM_POLYG
+from itertools import imap
 
 
 def get_features_dict(shapefiles, key=KEY, fnames=FEATURES):
-    """
+    u"""
     Name of the features should be shapefile
     `key` column values
     """
@@ -26,7 +29,7 @@ def get_features_dict(shapefiles, key=KEY, fnames=FEATURES):
 
 
 def get_final_coverage_polygon(features):
-    """
+    u"""
     Union of coverage and difference of
     obstacles.
     """
@@ -41,11 +44,11 @@ def get_final_coverage_polygon(features):
 def get_gpdframe(geojson):
     if isinstance(geojson, list):
         # Takes care of : [FeatureCollection,...,FeaturesCollection]
-        return list(map(gpd.GeoDataFrame.from_features, geojson))
+        return list(imap(gpd.GeoDataFrame.from_features, geojson))
     else:
         # Geojson type not property type.
-        if geojson['type'] == "FeatureCollection":
-            all_ = gpd.GeoDataFrame.from_features(geojson['features'])
+        if geojson[u'type'] == u"FeatureCollection":
+            all_ = gpd.GeoDataFrame.from_features(geojson[u'features'])
             return [
                 all_[all_.geom_type == GEOM_POINT],
                 all_[all_.geom_type == GEOM_POLYG]
@@ -57,7 +60,7 @@ def get_gpdframe(geojson):
 
 # Terrible naming conventions  I know.
 def create_gdframe(features, crs=CRS, no_points=False):
-    """
+    u"""
     Create GeoDataFrame from features
     """
     final_coverage = get_final_coverage_polygon(features)
@@ -66,21 +69,21 @@ def create_gdframe(features, crs=CRS, no_points=False):
         for d in features[START]:
             points.append({
                 KEY: START,
-                'geometry': d
+                u'geometry': d
             })
         for f in features[FUEL]:
             points.append({
                 KEY: FUEL,
-                'geometry': d
+                u'geometry': d
             })
     points.append({
         KEY: COVERAGE,
-        'geometry': final_coverage})
+        u'geometry': final_coverage})
     return gpd.GeoDataFrame(points, crs=crs)
 
 
 def get_hv_wh(final_coverage_polygon):
-    """
+    u"""
     Get haversine calcualted width and height of
     the smallest bounding rectangle of the coverage area.
     """
@@ -95,7 +98,7 @@ def get_hv_wh(final_coverage_polygon):
 
 
 def get_scale(final_coverage_polygon, meter=1):
-    """
+    u"""
     meter : 1 pixel == ? meters
     """
     w, h = get_hv_wh(final_coverage_polygon)

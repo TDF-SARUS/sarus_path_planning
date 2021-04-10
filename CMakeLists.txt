@@ -19,20 +19,21 @@ find_package(catkin REQUIRED COMPONENTS
 
 
 catkin_install_python(PROGRAMS
+  planner
   planner.py
 
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/sarus_path_planning
 )
 
 
-rojects also need
 catkin_package(
   INCLUDE_DIRS cpp_algorithms
 )
 
 
 include_directories(
-# include
+  include
   ${catkin_INCLUDE_DIRS}
+  cpp_algorithms
 )
 

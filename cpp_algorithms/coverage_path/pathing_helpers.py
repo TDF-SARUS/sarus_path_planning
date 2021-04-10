@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import numpy as np
 from cpp_algorithms.common_helpers import is_valid, get_random_coords
 
@@ -11,11 +12,11 @@ get_adj_8 = lambda x,y :[
 ]
 
 def splice_paths(coverage_path, splice_indices, splice_segments):
-    """
+    u"""
     Splices in `splice_segments` at the given `splice_indices` for
     the given `coverage_path`
     """
-    assert len(splice_indices) == len(splice_segments), "length discrepancy"
+    assert len(splice_indices) == len(splice_segments), u"length discrepancy"
     full_path_segments = []
     last_idx = 0
     for i,idx in enumerate(splice_indices):
@@ -31,7 +32,7 @@ def splice_paths(coverage_path, splice_indices, splice_segments):
     return np.concatenate(full_path_segments)
 
 def has_isolated_areas(area_map, obstacle=-1):
-    """
+    u"""
     Flood fills the area to check if there are 
     isolated areas.
     """
@@ -45,7 +46,7 @@ def has_isolated_areas(area_map, obstacle=-1):
         for point in to_visit:
             v_map[point] = True
             
-        for i in range(l):
+        for i in xrange(l):
             for adj_point in get_adj(*to_visit.pop(0)):
                 if is_valid(adj_point, area_map, obstacle) \
                     and not v_map[adj_point] \
@@ -68,7 +69,7 @@ def get_step(path_map, next_point, obstacle=-1):
     return possible_point, min_d_val
 
 def get_path(path_map, start_point, end_point, obstacle=-1):
-    """
+    u"""
     Get the shortest (directed) l1 distance
     between `start_point`, `end_point` for a given `path_map`.
     
@@ -84,7 +85,7 @@ def get_path(path_map, start_point, end_point, obstacle=-1):
     return path
 
 def wave_find_map(start_point, end_point, area_map, obstacle=-1):
-    """
+    u"""
     Creates a path map, which is a dist map that terminates once
     the required point is found.
     """
@@ -105,7 +106,7 @@ def wave_find_map(start_point, end_point, area_map, obstacle=-1):
 
             d_val += 1
 
-            for i in range(l):
+            for i in xrange(l):
                 for adj_point in get_adj(*to_visit.pop(0)):
                     if is_valid(adj_point, area_map, obstacle) \
                         and not v_map[adj_point] \
@@ -117,7 +118,7 @@ def wave_find_map(start_point, end_point, area_map, obstacle=-1):
     return d_map
 
 def get_shortest_l1_path(start_point, end_point, area_map, obstacle=-1):
-    """
+    u"""
     Returns the shortest Manhattan path between the two points
     taking obstacles into consideration.
     """

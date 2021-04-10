@@ -4,11 +4,12 @@ from skimage import measure
 from cpp_algorithms.constants import OB
 from cpp_algorithms.dist_fill import dist_fill
 
-"""
+u"""
 Functions to calculate the continuity correction matrix.
 """
+from __future__ import absolute_import
 def get_area_indices(area, value, inv=False, obstacle=OB):
-    """
+    u"""
     returns indices that have value and not obstacle
     if inv returns indices that don't have value and obstacle
     """
@@ -30,7 +31,7 @@ def get_area_indices(area, value, inv=False, obstacle=OB):
         return np.concatenate([np.where(mask)]).T
 
 def get_flood_matrix(area_map, pbar=False, obstacle=OB):
-    """
+    u"""
     Returns all the matrices of distances
     """
     points = get_area_indices(area_map, obstacle, True)
@@ -40,20 +41,20 @@ def get_flood_matrix(area_map, pbar=False, obstacle=OB):
     return  np.array(flood_matrix)
 
 def get_region_dist_map(index_matrix, coords):
-    """
+    u"""
     Broadcasts coords along index_matrix and returns the min l1
     """
     b_val = index_matrix.shape[0]
     coords = np.broadcast_to(coords, (b_val, *coords.shape))
     assert coords.shape[0] == index_matrix.shape[0] and \
         coords.shape[2] == index_matrix.shape[2], \
-        "something went wrong in broadcasting"
+        u"something went wrong in broadcasting"
     
     # To change the distance function change this line.
     return np.abs(index_matrix - coords).sum(axis=2).min(axis=1)
 
 def get_ci(cont_map, r, q):
-    """
+    u"""
     cont_map : continuity map that assigns unique labels to every isolated !obstacle
     r : value of region with the start point
     c : value(s) of region without the start point
@@ -67,7 +68,7 @@ def get_ci(cont_map, r, q):
     return min_dist_r - min_dist_q
     
 def min_point_map(cont_map, value, flood_matrix, obstacle=OB):
-    """
+    u"""
     Returns the min value to a region.
     """
     all_idx = get_area_indices(cont_map, obstacle, True, obstacle).T
@@ -79,7 +80,7 @@ def min_point_map(cont_map, value, flood_matrix, obstacle=OB):
     return min_map
     
 def get_ci_using_flood_matrix(cont_map, r, q, flood_matrix):
-    """
+    u"""
     Returns Ci calculated from the flood matrix
     """
     min_dist_r = min_point_map(cont_map, r, flood_matrix, obstacle=0)
@@ -88,13 +89,13 @@ def get_ci_using_flood_matrix(cont_map, r, q, flood_matrix):
 
 # Functions that deal with continuity.
 def coord_in_list(coord, list_):
-    """
+    u"""
     Checks if coord is present in the list exactly once.
     """
     return (np.abs(np.array(coord) - list_).sum(axis=1) ==0).sum() == 1
 
 def continuity_check(A, n, i):
-    """
+    u"""
     True if all areas are continuous.
     A : assignment map
     n : number of drones
@@ -110,7 +111,7 @@ def continuity_check(A, n, i):
         return True, None, None, None
 
 def continuity_fix(A, E, i, n, mi, start_point, mask, xy, values_at_xy, cont_map, flood_matrix):
-    """
+    u"""
     Fix continuity when there is none.
     """
     r = None
@@ -131,7 +132,7 @@ def continuity_fix(A, E, i, n, mi, start_point, mask, xy, values_at_xy, cont_map
     E[i] = E[i]*(C_i * some_constant + 1)
     
 def continuity_check_fix(A, E, i, n, mi, mask, start_point, flood_matrix):
-    """
+    u"""
     Calculate C_i and fix if `i`th drone's areas are not contiguous.
     """
     is_contig, xy, values_at_xy, cont_map = continuity_check(A, n, i)

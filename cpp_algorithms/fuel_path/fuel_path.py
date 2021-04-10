@@ -1,10 +1,11 @@
 
+from __future__ import absolute_import
 import numpy as np
 from cpp_algorithms.dist_fill import dist_fill
 from .fuel_path_helpers import get_refuel_idx, path_to_fuel
 
 def get_fuel_paths(coverage_path, area_map, fuel_points, fuel_capacity):
-    """
+    u"""
     Calculates detour paths to the closest fuel point with optimal
     fuel consumption.
 
