@@ -8,7 +8,7 @@ from cpp_algorithms.fuel_path import splice_paths
 
 def printer(metrics):
     for m in metrics:
-        print f"{m.rjust(20)} : {metrics[m]}"
+        print "{m.rjust(20)} : {metrics[m]}"
 
 def path_show(area_map, coverage_path,fuel_paths=None, \
               dist_map=None, figsize=(7,7),s=7, alpha=0.5,
@@ -17,7 +17,7 @@ def path_show(area_map, coverage_path,fuel_paths=None, \
     Displays `area_map` with the path 
     taken by the drone overlaid ontop of 
     it.
-    
+ 
     PARAMETERS
     ---
     area_map : -1 (obstacle), 0 valued 2-dim ndarray
@@ -107,11 +107,7 @@ def path_animate(values, interval=10, repeat=False):
                 features[u"fuelling"] = False
 
         mode = u"fuelling" if is_fu else u"mapping"
-        features[u"text"].set_text(f"{mode} :"+\
-                f": total path left : {frames - i - 1} :"+\
-                f": f_count :{features['f_count']} :"+\
-                f": c_count :{features['c_count']} :"+\
-                f": num_refuels:{features['f_num']+1}")
+        features[u"text"].set_text("1")
 
         if features[u"fuelling"]:
             f_num = features[u"f_num"]

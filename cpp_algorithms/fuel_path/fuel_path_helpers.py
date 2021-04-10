@@ -99,9 +99,9 @@ def get_refuel_idx(dist_map, coverage_path, fuel_cap):
             idx = freq[freq >= 0].argmin()
         except ValueError:
             raise ValueError(u"coverage path can't be traversed, insufficient fuel capacity")
-        
+
         if len(points) > 1 and points[-1] == points[-2]:
-            raise ValueError(f"coverage path can't be traversed, insufficient fuel capacity\n stuck at coverage path index :{points[-1]}")
+            raise ValueError("coverage path can't be traversed, insufficient fuel capacity\n stuck at coverage path index tonto")
 
         cu += idx
 
@@ -150,9 +150,9 @@ def splice_paths(coverage_path, fuel_paths, detour_idx, double_center=False):
         s_e.append(cumu_len)
         
         if double_center:
-            splice_in = [*fuel_path,*fuel_path[::-1][:-1]]
+            splice_in = [fuel_path,fuel_path[::-1][:-1]]
         else:
-            splice_in = [*fuel_path,*fuel_path[::-1][1:-1]]
+            splice_in = [fuel_path,fuel_path[::-1][1:-1]]
         
         seg = np.array(splice_in)
         cumu_len += seg.shape[0]

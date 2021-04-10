@@ -27,7 +27,7 @@ def splice_paths(coverage_path, splice_indices, splice_segments):
         if len(seg) > 0:
             full_path_segments.append(seg)
         last_idx = idx + 1
-        
+
     full_path_segments.append(np.array(coverage_path[last_idx:]))
     return np.concatenate(full_path_segments)
 
@@ -36,16 +36,16 @@ def has_isolated_areas(area_map, obstacle=-1):
     Flood fills the area to check if there are 
     isolated areas.
     """
-    
+
     v_map = (area_map == obstacle).copy()
     f_point = get_random_coords(area_map, 1, obstacle)[0]
     to_visit = [f_point]
-    
+
     while len(to_visit) > 0:
         l = len(to_visit)
         for point in to_visit:
             v_map[point] = True
-            
+
         for i in xrange(l):
             for adj_point in get_adj(*to_visit.pop(0)):
                 if is_valid(adj_point, area_map, obstacle) \
@@ -72,8 +72,8 @@ def get_path(path_map, start_point, end_point, obstacle=-1):
     u"""
     Get the shortest (directed) l1 distance
     between `start_point`, `end_point` for a given `path_map`.
-    
-    (directed ∵ distance should be min at end_point)
+
+    (directed distance should be min at end_point)
     """
     path = [start_point]
     end_val = path_map[end_point]
@@ -112,7 +112,7 @@ def wave_find_map(start_point, end_point, area_map, obstacle=-1):
                         and not v_map[adj_point] \
                         and adj_point not in to_visit:
                         to_visit.append(adj_point)
-                        
+
     loop()
     d_map[d_map == AREA_VAL] = obstacle
     return d_map

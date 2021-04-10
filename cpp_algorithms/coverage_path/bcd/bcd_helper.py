@@ -33,7 +33,7 @@ def backtracking_list(memory, _, matrix, x, y):
     }
     memory_ = np.array(memory)
     assert memory_.shape[1] == 2, "you've messed up something"
-    
+
     eight_di = {k: bt_cond_points[k](memory_) for k in bt_cond_points}
     is_valid_eight = {k: is_valid_vectorized(eight_di[k], matrix) for k in eight_di}
     cond_a = np.int0(is_valid_eight["r"] & ~is_valid_eight["br"])
@@ -42,9 +42,9 @@ def backtracking_list(memory, _, matrix, x, y):
     cond_d = np.int0(is_valid_eight["l"] & ~is_valid_eight["tl"])
     cond_e = np.int0(is_valid_eight["b"] & ~is_valid_eight["bl"])
     cond_f = np.int0(is_valid_eight["b"] & ~is_valid_eight["br"])
-    μ_of_s = (cond_a + cond_b+ cond_c + cond_d + cond_e + cond_f)
+    um_of_s = (cond_a + cond_b+ cond_c + cond_d + cond_e + cond_f)
      
-    backtrack_points =  memory_[μ_of_s > 0]
+    backtrack_points =  memory_[um_of_s > 0]
     if backtrack_points.shape[0] == 0:
         backtrack_points = memory_[is_valid_eight["r"] | is_valid_eight["l"] |
                 is_valid_eight["t"] | is_valid_eight["b"]]

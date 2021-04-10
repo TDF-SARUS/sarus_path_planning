@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import time
 import numpy as np
 import pandas as pd
@@ -18,7 +19,6 @@ u"""
 Test function to run tests on multiple image maps all at once.
 """
 
-from __future__ import absolute_import
 def single_robot_multiple(cpp_algo, area_maps, no_end=True, fuel_paths=False, start_point=None, center_point=None):
     u"""
     Returns a DataFrame of test Results. 
@@ -82,9 +82,9 @@ def single_robot_multiple(cpp_algo, area_maps, no_end=True, fuel_paths=False, st
             f_metrics[u"max_dist_fuel"] = dist_map.max()
 
         results.append(set([
-            **t_metrics,
-            **c_metrics,
-            **f_metrics]))
+            t_metrics,
+            c_metrics,
+            f_metrics]))
     return pd.DataFrame(results)
 
 
@@ -180,9 +180,9 @@ def single_robot_single(cpp_algo, area_map, no_end=True, fuel_paths=False,
         f_metrics[u"max_dist_fuel"] = dist_map.max()
 
     metrics = set([
-        **t_metrics,
-        **c_metrics,
-        **f_metrics,])
+        t_metrics,
+        c_metrics,
+        f_metrics,])
 
     values = {
         u"area_map": area_map,

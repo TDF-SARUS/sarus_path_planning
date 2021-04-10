@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import numpy as np
 from tqdm.auto import tqdm
 from skimage import measure
@@ -7,7 +8,6 @@ from cpp_algorithms.dist_fill import dist_fill
 u"""
 Functions to calculate the continuity correction matrix.
 """
-from __future__ import absolute_import
 def get_area_indices(area, value, inv=False, obstacle=OB):
     u"""
     returns indices that have value and not obstacle
@@ -45,7 +45,7 @@ def get_region_dist_map(index_matrix, coords):
     Broadcasts coords along index_matrix and returns the min l1
     """
     b_val = index_matrix.shape[0]
-    coords = np.broadcast_to(coords, (b_val, *coords.shape))
+    coords = np.broadcast_to(coords, (b_val, coords.shape))
     assert coords.shape[0] == index_matrix.shape[0] and \
         coords.shape[2] == index_matrix.shape[2], \
         u"something went wrong in broadcasting"
