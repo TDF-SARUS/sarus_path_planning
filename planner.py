@@ -8,7 +8,12 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+
 import rospy
+from std_msgs.msg import Int8
+from std_msgs.msg import Int32MultiArray
+from geometry_msgs.msg import PoseStamped
+
 from skimage.draw import polygon
 
 from cpp_algorithms import darp, stc, bcd, wavefront
@@ -18,11 +23,19 @@ from cpp_algorithms.darp.darp_helpers import get_assigned_count
 from cpp_algorithms.coverage_path.pathing_helpers import has_isolated_areas
 
 
+#from cpp_algorithms import dist_fill
 
 def cambiaIntervalo (N, a0, b0, aF, bF):
     return aF + (bF - aF)*(N - a0)/(b0 - a0)
 
+def alg2gazebo (point):
+    newPoint = [[tuple([cambiaIntervalo(coord, 0, 31, -100, 100) for coord in drone]) for drone in drones] for drones in point]
+    return newPoint
 
+def gazebo2alg (point):
+    newPoint = [[tuple([cambiaIntervalo(coord, -100, 100, 0, 31) for coord in drone]) for drone in drones] for drones in point]
+    return newPoint
+'''
 def gazebo2alg (point):
     newPoint = []
     for i in range(len(point)):
@@ -36,7 +49,8 @@ def alg2gazebo (point): #####FIX
         for j in range(len(point[i])):
             for k in range(point[i][j]):
                 newPoint[i][j][k]= cambiaIntervalo(point[i][j][k], 0, 31, -100, 100)
-    return newPoint
+    return 
+'''
 
 
 def makePolygon (points, width=10):	#Polygon to bitmap with pixels of ~ 10x10 m
@@ -113,9 +127,8 @@ base_polygon = [] #poligono del mapa
 
 
 
-rospy.Subscriber('/interfaz/poligono', POLYGON_TYPE, poly_cb)
-rospy.Subscriber('/interfaz/poligono', int8, poly_cb)
-
+rospy.Subscriber('/interfaz/poligono', Int32MultiArray, poly_cb)
+rospy.Subscriber('/interfaz/poligono', Int8, poly_cb)
 
 area_maps = get_all_area_maps("test_maps")
 area_map = area_maps[1]
@@ -153,21 +166,79 @@ for drone in range(len(coverage_path_gazebo)):        # Number of drones
 
 pubs = []
 for drone in range(n):        # Number of drones
-    pubs.append(startpublishers(drone+1)) #+1 because in Python first array is 0
+    pubs.append(initPublisher(drone+1)) #+1 because in Python first array is 0
 
 
 # Execute the function for every position and for all of the drones
-for pos in maxPos:                                # Maximum number of positions
+for pos in range(maxPos):                                # Maximum number of positions
     for drone in range(len(coverage_path_gazebo)):        # Number of drones
         # Try and except to deal with the problem of having different number of positions
-        try:
+        #try:
             # Call the function publishTrajectory sending the number of the drone and the desired position
-            publishTrajectory(drone+1, coverage_path_gazebo[drone][pos])
+            publishTrajectory(pubs[drone], coverage_path_gazebo[drone][pos])
             print('Drone ',drone+1, ' = ', coverage_path_gazebo[drone][pos])
-        except:
-            print('Drone ',drone+1, ' has reached its final position')
+        #except:
+            #print('Drone ',drone+1, ' has reached its final position')
     print()
     rate.sleep() # 5s
+'''
+# In[3]:
 
 
+start_points = get_random_coords(area_map, n)
+A, losses = darp(300, area_map, start_points, pbar=True)
+drone_maps = [get_drone_map(A,i) for i in range(n)]
 
+print("assigned : ", get_assigned_count(A))
+print('has isolated : ',[has_isolated_areas(dm) for dm in drone_maps])
+imshow(A,1,4,1, figsize=(20,5))
+imshow_scatter(start_points,color="black")
+dist_maps = [dist_fill(drone_maps[i],[start_points[i]]) for i in range(n)]
+[imshow(dist_maps[i],1,4,i+2) for i in range(n)];
+
+# **Wavefront**
+
+# In[ ]:
+
+
+coverage_paths = [wavefront(drone_maps[i],start_points[i]) for i in range(n)]
+imshow(A,1,4,1, figsize=(20,5))
+for i in range(n):
+    imshow(dist_maps[i],1,4,i+2)
+    plot(coverage_paths[i],color="white",alpha=0.6)
+    end_point = coverage_paths[i][-1]
+    imshow_scatter(start_points[i], color="green")
+    imshow_scatter(end_point, color="red")
+
+
+# **BCD**
+
+# In[ ]:
+
+
+coverage_paths = [bcd(drone_maps[i],start_points[i]) for i in range(n)]
+imshow(A,1,4,1, figsize=(20,5))
+for i in range(n):
+    imshow(dist_maps[i],1,4,i+2)
+    plot(coverage_paths[i],color="white",alpha=0.6)
+    end_point = coverage_paths[i][-1]
+    imshow_scatter(start_points[i], color="green")
+    imshow_scatter(end_point, color="red")
+
+
+# **STC**
+
+# In[ ]:
+
+
+coverage_paths = [stc(drone_maps[i],start_points[i]) for i in range(n)]
+imshow(A,1,4,1, figsize=(20,5))
+for i in range(n):
+    imshow(dist_maps[i],1,4,i+2)
+    plot(coverage_paths[i],color="white",alpha=0.6)
+    end_point = coverage_paths[i][-1]
+    imshow_scatter(start_points[i], color="green")
+    imshow_scatter(end_point, color="red")
+
+plt.show()
+'''
