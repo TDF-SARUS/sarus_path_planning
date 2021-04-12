@@ -31,12 +31,12 @@ def get_raster(gpdf_final, scale=2000, CRS=CRS):
     mix = np.int64(mix)
     sh = mix.max(axis=0)
 
-    r, c = polygon(*mix.T, sh)
+    r, c = polygon(mix.T, sh)
     p = np.full(mix.max(axis=0), -1)
     p[r, c] = 0
 
     for o in ite:
-        r, c = polygon(*np.int16((o-mn)*scale/mx).T, sh)
+        r, c = polygon(np.int16((o-mn)*scale/mx).T, sh)
         p[r, c] = -1
 
     return p, mn, mx

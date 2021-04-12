@@ -12,6 +12,9 @@ from __future__ import absolute_import
 import numpy as np
 import matplotlib.pyplot as plt
 import rospy
+import std_msgs.msg
+from std_msgs.msg import Int32MultiArray
+from geometry_msgs.msg import PoseStamped
 #from skimage.draw import polygon
 
 from cpp_algorithms import darp, stc, bcd, wavefront
@@ -21,26 +24,17 @@ from cpp_algorithms.darp.darp_helpers import get_assigned_count
 from cpp_algorithms.coverage_path.pathing_helpers import has_isolated_areas
 
 
-
+# Change coordinates
 def cambiaIntervalo (N, a0, b0, aF, bF):
     return aF + (bF - aF)*(N - a0)/(b0 - a0)
 
-
 def gazebo2alg (point):
-    newPoint = []
-    for i in xrange(len(point)):
-        newPoint.append(cambiaIntervalo(point(i), -100, 100, 0, 31))
+    newPoint = [[tuple([cambiaIntervalo(coord, -100, 100, 0, 31) for coord in drone]) for drone in drones] for drones in point]
     return newPoint
 
-def alg2gazebo (point): #####FIX
-    point=np.array(point)
-    newPoint = point.copy()
-    for i in xrange(len(point)):
-        for j in xrange(len(point[i])):
-            for k in xrange(point[i][j]):
-                newPoint[i][j][k]= cambiaIntervalo(point[i][j][k], 0, 31, -100, 100)
+def alg2gazebo (point):
+    newPoint = [[tuple([cambiaIntervalo(coord, 0, 31, -100, 100) for coord in drone]) for drone in drones] for drones in point]
     return newPoint
-
 
 def makePolygon (points, width=10):	#Polygon to bitmap with pixels of ~ 10x10 m
 
@@ -84,10 +78,9 @@ def publishTrajectory(pub, coordinates):
     msg.pose.position.x=coordinates[0]
     msg.pose.position.y=coordinates[1]
     msg.pose.position.z=1.0 #coordinates[2]
+
     # Publish the message (coordinates of the position of drone droneNum)
     pub.publish(msg)
-
-
 
 def poly_cb(data):
     global base_polygon
@@ -117,11 +110,11 @@ base_polygon = [] #poligono del mapa
 
 
 
-rospy.Subscriber(u'/interfaz/poligono', POLYGON_TYPE, poly_cb)
-rospy.Subscriber(u'/interfaz/poligono', int8, poly_cb)
+rospy.Subscriber(u'/interfaz/poligono', INT32MultiArray, poly_cb)
+rospy.Subscriber(u'/interfaz/poligono', Int8, poly_cb)
 
 
-area_maps = get_all_area_maps(u"test_maps")
+area_maps = get_all_area_maps(u'test_maps')
 area_map = area_maps[1]
 
 #area_map, Xwidth, Ywidth=makePolygon(pol) #Make bitmap from polygon
@@ -157,16 +150,16 @@ for drone in xrange(len(coverage_path_gazebo)):        # Number of drones
 
 pubs = []
 for drone in xrange(n):        # Number of drones
-    pubs.append(startpublishers(drone+1)) #+1 because in Python first array is 0
+    pubs.append(initPublisher(drone+1)) #+1 because in Python first array is 0
 
 
 # Execute the function for every position and for all of the drones
-for pos in maxPos:                                # Maximum number of positions
+for pos in xrange(maxPos):                                # Maximum number of positions
     for drone in xrange(len(coverage_path_gazebo)):        # Number of drones
         # Try and except to deal with the problem of having different number of positions
         try:
             # Call the function publishTrajectory sending the number of the drone and the desired position
-            publishTrajectory(drone+1, coverage_path_gazebo[drone][pos])
+            publishTrajectory(pubs[drone], coverage_path_gazebo[drone][pos])
             print u'Drone ',drone+1, u' = ', coverage_path_gazebo[drone][pos]
         except:
             print u'Drone ',drone+1, u' has reached its final position'
