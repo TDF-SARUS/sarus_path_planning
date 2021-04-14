@@ -112,12 +112,12 @@ def path_animate(values, interval=10, repeat=False):
         if features[u"fuelling"]:
             f_num = features[u"f_num"]
             y_,x_ = features[u"f_path"][f_num].get_data()
-            x_ = [*x_, x[i]]
-            y_ = [*y_, y[i]]
+            x_ = [x_, x[i]]
+            y_ = [y_, y[i]]
             features[u"f_path"][f_num].set_data(y_,x_)
         else:
             y_,x_ = features[u"c_path"].get_data()
-            x_ = [*x_, x[i]]
-            y_ = [*y_, y[i]]
+            x_ = [x_, x[i]]
+            y_ = [y_, y[i]]
             features[u"c_path"].set_data(y_,x_)
     return FuncAnimation(fig, next_frame, frames=frames, interval=interval, repeat=repeat);
