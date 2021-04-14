@@ -25,7 +25,7 @@ catkin_install_python(PROGRAMS
 )
 
 
-rojects also need
+# projects also need
 catkin_package(
   INCLUDE_DIRS cpp_algorithms
 )
