@@ -55,3 +55,4 @@ def cpp(area_map, start_points, fuel_points=None, fuel_capacity=None, online=Fal
             detour_idxes.append(detour_idx)
         return coverage_paths, full_paths, detour_idxes
     return coverage_paths, None, None
+
