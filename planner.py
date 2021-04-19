@@ -35,7 +35,7 @@ def gazebo2alg (point):
     newPoint = [[[cambiaIntervalo(coord, -100, 100, 0, 31) for coord in drone] for drone in drones] for drones in point]
     return newPoint
 '''
-def makePolygon (points, width=20):	#Polygon to bitmap with pixels of ~ 10x10 m
+def makePolygon (points, width=100):	#Polygon to bitmap with pixels of ~ 10x10 m
     # Acotamos el cuadrado
     north = points[0].y
     south = points[0].y
@@ -51,10 +51,12 @@ def makePolygon (points, width=20):	#Polygon to bitmap with pixels of ~ 10x10 m
         if point.x < west:
             west = point.x
     # Dividimos en grupos de 10
-    Ysize = north - south
+    Ysize = np.floor(north - south)
+    Ysize = np.uint8(Ysize)
     Yindexes = np.floor(Ysize/width)		#N of divisions
     Ywidth = Ysize/Yindexes			#exact width of divisions
-    Xsize = north - south
+    Xsize = np.floor(north - south)
+    Xsize = np.uint8(Xsize)
     Xindexes = np.floor(Xsize/width)
     Xwidth = Xsize/Xindexes
     y = [];
@@ -64,8 +66,6 @@ def makePolygon (points, width=20):	#Polygon to bitmap with pixels of ~ 10x10 m
         x.append(np.floor(cambiaIntervalo(point.x, west, east, 0, Xindexes)))
 
     map_y, map_x = polygon(y,x)
-    print(Ysize)
-    print(Xsize)
     area_map =np.zeros((Ysize, Xsize), dtype=np.uint8)
     area_map[map_y, map_x]=1
     return area_map, Yindexes, Xindexes, north, south, east, west
