@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 #  ADD DESCRIPTION
 #
@@ -20,7 +20,7 @@ from cpp_algorithms import get_drone_map, get_random_coords
 from cpp_algorithms import get_all_area_maps, plot, imshow, imshow_scatter
 from cpp_algorithms.darp.darp_helpers import get_assigned_count
 from cpp_algorithms.coverage_path.pathing_helpers import has_isolated_areas
-
+from cpp_algorithms import dist_fill
 
 #from cpp_algorithms import dist_fill
 
@@ -36,7 +36,6 @@ def gazebo2alg (point):
     return newPoint
 '''
 def makePolygon (points, width=20):	#Polygon to bitmap with pixels of ~ 10x10 m
-
     # Acotamos el cuadrado
     north = points[0].y
     south = points[0].y
@@ -44,35 +43,33 @@ def makePolygon (points, width=20):	#Polygon to bitmap with pixels of ~ 10x10 m
     west = points[0].x
     for point in points:
         if point.y > north:
-            north = point.y 
+            north = point.y
         if point.y < south:
             south = point.y
         if point.x > east:
-            east = point.x 
+            east = point.x
         if point.x < west:
             west = point.x
-
     # Dividimos en grupos de 10
     Ysize = north - south
-    Yindexes = np.floor(Ysize/width)          # Número de índices del array_map
-    Ywidth = Ysize/Yindexes             # Ancho de barrido que usaremos
-
+    Yindexes = np.floor(Ysize/width)		#N of divisions
+    Ywidth = Ysize/Yindexes			#exact width of divisions
     Xsize = north - south
-    Xindexes = np.floor(Xsize/width)          # Número de índices del array_map
-    Xwidth = Xsize/Xindexes             # Ancho de barrido que usaremos
-
+    Xindexes = np.floor(Xsize/width)
+    Xwidth = Xsize/Xindexes
     y = [];
     x = [];
     for point in points:
         y.append(np.floor(cambiaIntervalo(point.y, south, north, 0, Yindexes)))
         x.append(np.floor(cambiaIntervalo(point.x, west, east, 0, Xindexes)))
 
-    print(y)
-    print(x)
-    area_maps = np.array(polygon(y,x))
+    map_y, map_x = polygon(y,x)
+    print(Ysize)
+    print(Xsize)
+    area_map =np.zeros((Ysize, Xsize), dtype=np.uint8)
+    area_map[map_y, map_x]=1
+    return area_map, Yindexes, Xindexes, north, south, east, west
 
-    return area_maps, Yindexes, Xindexes, north, south, east, west
-    
 def appendPath(coordinates, to_C2):
     msg = PoseStamped()
     # Also possible with numpy
@@ -91,6 +88,7 @@ def poly_cb(data):
     global update
     update = True
 
+
 def n_cb(data):
     global n
     n=data
@@ -107,6 +105,7 @@ pubAerostack = rospy.Publisher('topic', Path, queue_size=10)
 
 # Frequency of the sleep
 rate = rospy.Rate(0.2) #0.2 Hz -> 5s
+rospy.loginfo('Mision Planner ready')
 
 # Datos de Interfaz:
 
@@ -117,30 +116,41 @@ old_polygon = np.empty(2)
 #rospy.Subscriber('/interfaz/poligono', Int32MultiArray, poly_cb)
 rospy.Subscriber('/mapviz/polygon', PolygonStamped, poly_cb)
 
-n = 1000
 
-while n:
+while True:
     if 'update' in vars() and update == 1:
         rospy.loginfo('Recalculating path...')
         #area_maps = get_all_area_maps("test_maps")
         #area_map = area_maps[1]
         area_map, Yindexes, Xindexes, north, south, east, west = makePolygon(base_polygon) #Make bitmap from polygon
-
-        start_points = get_random_coords(area_map, n) # Random start coordinates
-
-        A, losses = darp(50, area_map, start_points, pbar=True) # Area division algorithm
-
+        start_points = get_random_coords(area_map, 1) # Random start coordinates
+        A, losses = darp(100, area_map, start_points, pbar=True) # Area division algorithm
         drone_maps = [get_drone_map(A,i) for i in range(n)] #assign a map for each drone
-
         coverage_paths = [bcd(drone_maps[i],start_points[i]) for i in range(n)]  #Calculate the routes for each drone
         old_polygon = base_polygon
+#######
+        imshow(A,1,4,1, figsize=(20,5))
+        imshow_scatter(start_points,color="black")
+        dist_maps = [dist_fill(drone_maps[i],[start_points[i]]) for i in range(n)]
+        [imshow(dist_maps[i],1,4,i+2) for i in range(n)];
+
+        for i in range(n):
+            imshow(dist_maps[i],1,4,i+2)
+            plot(coverage_paths[i],color="white",alpha=0.6)
+            end_point = coverage_paths[i][-1]
+            imshow_scatter(start_points[i], color="green")
+            imshow_scatter(end_point, color="red")
+
+#        plt.show()
+#####
+
+
+
 
         #################################################
         ### meter topic salida a aerostack drone111/#####
         #################################################
-
         coverage_path_gazebo = alg2gazebo(coverage_paths, Yindexes, Xindexes, north, south, east, west)
-
         # Drone with the maximum number of positions: Each drone has a different path with different number of points
         maxPos=0
         for drone in range(len(coverage_path_gazebo)):        # Number of drones
@@ -168,4 +178,4 @@ while n:
         pubC2.publish(C2Path)
         update = False
         n = n-1
-
+        #quit()
