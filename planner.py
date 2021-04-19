@@ -22,7 +22,6 @@ from cpp_algorithms.darp.darp_helpers import get_assigned_count
 from cpp_algorithms.coverage_path.pathing_helpers import has_isolated_areas
 from cpp_algorithms import dist_fill
 
-#from cpp_algorithms import dist_fill
 
 def cambiaIntervalo (N, a0, b0, aF, bF):
     return aF + (bF - aF)*(N - a0)/(b0 - a0)
@@ -35,7 +34,7 @@ def gazebo2alg (point):
     newPoint = [[[cambiaIntervalo(coord, -100, 100, 0, 31) for coord in drone] for drone in drones] for drones in point]
     return newPoint
 '''
-def makePolygon (points, width=100):	#Polygon to bitmap with pixels of ~ 10x10 m
+def makePolygon (points, width=10):	#Polygon to bitmap with pixels of ~ 10x10 m
     # Acotamos el cuadrado
     north = points[0].y
     south = points[0].y
@@ -51,13 +50,13 @@ def makePolygon (points, width=100):	#Polygon to bitmap with pixels of ~ 10x10 m
         if point.x < west:
             west = point.x
     # Dividimos en grupos de 10
-    Ysize = np.floor(north - south)
-    Ysize = np.uint8(Ysize)
+    Ysize = north - south
     Yindexes = np.floor(Ysize/width)		#N of divisions
+    Yindexes = np.int8(Yindexes)
     Ywidth = Ysize/Yindexes			#exact width of divisions
-    Xsize = np.floor(north - south)
-    Xsize = np.uint8(Xsize)
+    Xsize = north - south
     Xindexes = np.floor(Xsize/width)
+    Xindexes = np.int8(Xindexes)
     Xwidth = Xsize/Xindexes
     y = [];
     x = [];
@@ -65,9 +64,12 @@ def makePolygon (points, width=100):	#Polygon to bitmap with pixels of ~ 10x10 m
         y.append(np.floor(cambiaIntervalo(point.y, south, north, 0, Yindexes)))
         x.append(np.floor(cambiaIntervalo(point.x, west, east, 0, Xindexes)))
 
-    map_y, map_x = polygon(y,x)
-    area_map =np.zeros((Ysize, Xsize), dtype=np.uint8)
+    print("Square width: " + str(Ysize)+"x"+str(Xsize))
+    print("N of squares: " + str(Yindexes)+"x"+str(Xindexes))
+    map_x, map_y = polygon(y,x)
+    area_map =np.zeros((Yindexes, Xindexes), dtype=np.int8)
     area_map[map_y, map_x]=1
+    area_map=area_map-1
     return area_map, Yindexes, Xindexes, north, south, east, west
 
 def appendPath(coordinates, to_C2):
@@ -120,15 +122,14 @@ rospy.Subscriber('/mapviz/polygon', PolygonStamped, poly_cb)
 while True:
     if 'update' in vars() and update == 1:
         rospy.loginfo('Recalculating path...')
-        #area_maps = get_all_area_maps("test_maps")
-        #area_map = area_maps[1]
         area_map, Yindexes, Xindexes, north, south, east, west = makePolygon(base_polygon) #Make bitmap from polygon
-        start_points = get_random_coords(area_map, 1) # Random start coordinates
-        A, losses = darp(100, area_map, start_points, pbar=True) # Area division algorithm
+        start_points = get_random_coords(area_map, n) # Random start coordinates
+        A, losses = darp(300, area_map, start_points, pbar=True) # Area division algorithm
         drone_maps = [get_drone_map(A,i) for i in range(n)] #assign a map for each drone
         coverage_paths = [bcd(drone_maps[i],start_points[i]) for i in range(n)]  #Calculate the routes for each drone
         old_polygon = base_polygon
 #######
+        '''
         imshow(A,1,4,1, figsize=(20,5))
         imshow_scatter(start_points,color="black")
         dist_maps = [dist_fill(drone_maps[i],[start_points[i]]) for i in range(n)]
@@ -142,11 +143,8 @@ while True:
             imshow_scatter(end_point, color="red")
 
 #        plt.show()
-#####
 
-
-
-
+        '''
         #################################################
         ### meter topic salida a aerostack drone111/#####
         #################################################
@@ -177,5 +175,4 @@ while True:
 
         pubC2.publish(C2Path)
         update = False
-        n = n-1
-        #quit()
+#        quit()
